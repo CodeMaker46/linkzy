@@ -1,0 +1,2 @@
+# linkzy
+Cutu ka project
