@@ -316,6 +316,7 @@ export default function ExpenseTracker() {
                             <div className="text-right">
                               <div className={`font-bold ${item.type === 'income' ? 'text-green-500' : 'text-red-500'}`}>{item.type === 'income' ? '+' : '-'}₹{item.amount.toFixed(2)}</div>
                               <div className="text-xs opacity-60">Cash</div>
+
                             </div>
                             <div className="flex gap-2">
                               <button onClick={() => { setEditingItemId(item.id); setEditedItem(item); }} className="text-white/60 hover:text-white"><Edit size={16} /></button>
