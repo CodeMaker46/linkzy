@@ -9,6 +9,7 @@ import { useAppStore } from '../store/useAppStore.ts'
 import StatCard from './StatCard.tsx'
 import { CheckCircle2, Heart, CalendarDays, MessageCircle, Music, Code, Wallet, Image as ImageIcon, LayoutGrid } from 'lucide-react'
 import HeroBanner from './HeroBanner.tsx'
+import ExpenseTracker from './ExpenseTracker.tsx'
 
 function computePairId(a: string, b: string) {
   return [a, b].sort().join('_')
@@ -27,7 +28,7 @@ export default function Dashboard() {
     if (!pairId || !tasksRef) return
     const q = query(tasksRef, orderBy('createdAt', 'desc'))
     return onSnapshot(q, snap => {
-      const all = snap.docs.map(d => d.data() as any)
+      const all = snap.docs.map(d => d.data({ serverTimestamps: 'estimate' }) as any)
       setTaskCount(all.length)
       setCompletedCount(all.filter(t => t.completed).length)
     })
@@ -47,28 +48,20 @@ export default function Dashboard() {
         <StatCard icon={<Heart size={18} />} title="Couple Mood" subtitle="Tap to set yours" delay={0.04}>
           <MoodTracker />
         </StatCard>
-        <StatCard icon={<CalendarDays size={18} />} title="Calendar" subtitle="Upcoming events" delay={0.06}>
-          <div className="text-sm opacity-80">Check shared schedule</div>
-        </StatCard>
-        <StatCard icon={<LayoutGrid size={18} />} title="Quick Links" subtitle="Jump back in" delay={0.08}>
-          <div className="flex flex-wrap gap-2 pt-1">
-            <Quick to="/chat" icon={<MessageCircle size={14} />} label="Chat" />
-            <Quick to="/music" icon={<Music size={14} />} label="Music" />
-            <Quick to="/coding" icon={<Code size={14} />} label="Coding" />
-            <Quick to="/expenses" icon={<Wallet size={14} />} label="Expenses" />
-            <Quick to="/memories" icon={<ImageIcon size={14} />} label="Memories" />
-          </div>
-        </StatCard>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <motion.div layout className="card card-hover p-4 xl:col-span-2">
+      <div className="grid grid-cols-1 gap-4">
+        <motion.div layout className="card card-hover p-4 bg-black/20">
+          <h3 className="font-semibold mb-2">Shared To-Do</h3>
+          <ToDoList />
+        </motion.div>
+        <motion.div layout className="card card-hover p-4 bg-black/20">
           <h3 className="font-semibold mb-2">Calendar</h3>
           <Calendar />
         </motion.div>
-        <motion.div layout className="card card-hover p-4">
-          <h3 className="font-semibold mb-2">Shared To-Do</h3>
-          <ToDoList />
+        <motion.div layout className="card card-hover p-4 bg-black/20">
+          <h3 className="font-semibold mb-2">Expense Tracker</h3>
+          <ExpenseTracker />
         </motion.div>
       </div>
     </div>

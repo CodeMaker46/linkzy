@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 
 export default function StatCard({
@@ -22,7 +22,7 @@ export default function StatCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay }}
-      className="card card-hover p-4"
+      className="card card-hover p-4 bg-black/20"
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">

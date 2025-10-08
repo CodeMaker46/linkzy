@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 export default function SectionHeader({ icon, title, subtitle }: { icon?: ReactNode; title: string; subtitle?: string }) {
   return (

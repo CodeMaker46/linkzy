@@ -1,13 +1,10 @@
 import ChatBox from '../components/ChatBox'
-import PairSetup from '../components/PairSetup'
 
 export default function ChatPage() {
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Chat</h2>
-      <PairSetup />
+    <div className="flex flex-col h-[calc(100vh-8rem)] w-full max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Chat</h2>
       <ChatBox />
     </div>
   )
 }
-

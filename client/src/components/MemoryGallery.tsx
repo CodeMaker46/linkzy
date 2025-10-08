@@ -19,7 +19,7 @@ export default function MemoryGallery() {
   useEffect(() => {
     if (!pairId || !memRef) return
     const q = query(memRef, orderBy('timestamp', 'desc'))
-    return onSnapshot(q, snap => setItems(snap.docs.map(d => ({ id: d.id, ...d.data() }))))
+    return onSnapshot(q, snap => setItems(snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }))))
   }, [pairId, memRef])
 
   async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -35,8 +35,8 @@ export default function MemoryGallery() {
   return (
     <div className="space-y-3">
       {!pairId && (
-        <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm">
-          Link a partner in Chat to share memories.
+        <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm">
+          Go to Profile to connect with a partner and share memories.
         </div>
       )}
       <div>

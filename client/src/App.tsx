@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-do
 import { AnimatePresence, motion } from 'framer-motion'
 import ThemeToggle from './components/ThemeToggle'
 import LogoutButton from './components/LogoutButton'
-import { Heart, MessageCircle, Music, Code, Wallet, Image as ImageIcon, LayoutGrid } from 'lucide-react'
+import { MessageCircle, Music, Code, Wallet, Image as ImageIcon, LayoutGrid, User } from 'lucide-react'
 import Home from './pages/Home'
 import DashboardPage from './pages/DashboardPage'
 import ChatPage from './pages/ChatPage'
@@ -11,6 +11,7 @@ import MusicPage from './pages/MusicPage'
 import CodingPage from './pages/CodingPage'
 import ExpensesPage from './pages/ExpensesPage'
 import MemoriesPage from './pages/MemoriesPage'
+import ProfilePage from './pages/ProfilePage'
 import LoginPage from './pages/LoginPage'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -27,6 +28,7 @@ function AppShell() {
           </div>
         </div>
         <nav className="space-y-2">
+          <SidebarLink to="/profile" label="Profile" icon={<User size={16} />} />
           <SidebarLink to="/dashboard" label="Dashboard" icon={<LayoutGrid size={16} />} />
           <SidebarLink to="/chat" label="Chat" icon={<MessageCircle size={16} />} />
           <SidebarLink to="/music" label="Music" icon={<Music size={16} />} />
@@ -57,6 +59,7 @@ function AppShell() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route element={<ProtectedRoute />}>
+                  <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/chat" element={<ChatPage />} />
                   <Route path="/music" element={<MusicPage />} />

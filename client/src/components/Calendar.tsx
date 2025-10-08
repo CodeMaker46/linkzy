@@ -1,18 +1,36 @@
-import React, { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { addDays, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, format, isSameMonth, isSameDay, addWeeks, subWeeks, compareAsc } from 'date-fns'
 import Button from './ui/button'
 import { useAppStore } from '../store/useAppStore'
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc
+} from 'firebase/firestore'
+import { db } from '../firebase/firebase'
 
 // Event type
 interface CalendarEvent {
   id: string
   title: string
   date: Date
+  createdAt?: any
+  createdBy?: string
 }
 
 const VIEWS = ['month', 'week', 'day'] as const
 
 type ViewType = typeof VIEWS[number]
+
+function computePairId(a: string, b: string) {
+  return [a, b].sort().join('_')
+}
 
 function getDaysInMonthGrid(date: Date) {
   const start = startOfWeek(startOfMonth(date), { weekStartsOn: 0 })
@@ -40,6 +58,30 @@ export default function Calendar() {
   const [eventTitle, setEventTitle] = useState('')
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null)
   const theme = useAppStore(s => s.theme)
+  const user = useAppStore(s => s.user)
+  const partnerUid = useAppStore(s => s.partnerUid)
+  const pairId = user?.uid && partnerUid ? computePairId(user.uid, partnerUid) : null
+  const eventsRef = useMemo(() => pairId ? collection(db, 'pairs', pairId, 'events') : null, [pairId])
+
+  // Real-time sync from Firestore
+  useEffect(() => {
+    if (!pairId || !eventsRef) return
+    const q = query(eventsRef, orderBy('date', 'asc'))
+    const unsub = onSnapshot(q, snap => {
+      const next: CalendarEvent[] = snap.docs.map(d => {
+        const data = d.data({ serverTimestamps: 'estimate' })
+        return {
+          id: d.id,
+          title: String(data.title ?? ''),
+          date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
+          createdAt: data.createdAt,
+          createdBy: data.createdBy
+        }
+      })
+      setEvents(next)
+    }, err => console.error('Firestore calendar error:', err))
+    return () => unsub()
+  }, [pairId, eventsRef])
 
   // Navigation handlers
   const goToday = () => setCurrent(new Date())
@@ -72,18 +114,26 @@ export default function Calendar() {
     setEventTitle('')
     setEditingEvent(null)
   }
-  const saveEvent = () => {
-    if (!modalDate || !eventTitle.trim()) return
+  const saveEvent = async () => {
+    if (!modalDate || !eventTitle.trim() || !user || !pairId || !eventsRef) return
     if (editingEvent) {
-      setEvents(events.map(ev => ev.id === editingEvent.id ? { ...ev, title: eventTitle, date: modalDate } : ev))
+      await updateDoc(doc(db, 'pairs', pairId, 'events', editingEvent.id), {
+        title: eventTitle,
+        date: modalDate
+      })
     } else {
-      setEvents([...events, { id: Date.now() + '', title: eventTitle, date: modalDate }])
+      await addDoc(eventsRef, {
+        title: eventTitle,
+        date: modalDate,
+        createdAt: serverTimestamp(),
+        createdBy: user.uid
+      })
     }
     closeModal()
   }
-  const deleteEvent = () => {
-    if (editingEvent) {
-      setEvents(events.filter(ev => ev.id !== editingEvent.id))
+  const deleteEvent = async () => {
+    if (editingEvent && pairId) {
+      await deleteDoc(doc(db, 'pairs', pairId, 'events', editingEvent.id))
       closeModal()
     }
   }
@@ -141,19 +191,21 @@ export default function Calendar() {
               className={
                 'relative rounded-xl p-2 min-h-[70px] flex flex-col gap-1 cursor-pointer transition-all ' +
                 (isCurrentMonth ? 'bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10' : 'bg-white/5 dark:bg-white/10 opacity-60') +
-                (isToday ? ' border-2 border-pink-500' : '')
+                (isToday ? ' border-2 border-pink-500' : '') +
+                (dayEvents.length > 0 ? ' ring-2 ring-purple-400/50' : '')
               }
               onClick={e => { if ((e.target as HTMLElement).tagName === 'DIV') openModal(date) }}
             >
-              <div className="text-xs font-semibold mb-1 opacity-80 text-center">
+              <div className="text-xs font-semibold mb-1 opacity-80 text-center relative">
                 {format(date, 'd')}
+                {dayEvents.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-purple-500 rounded-full"></span>
+                )}
               </div>
               <div className="flex flex-col gap-1">
                 {dayEvents.map(ev => (
                   <div key={ev.id} className="truncate rounded bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-0.5 text-xs font-medium shadow flex items-center justify-between gap-2">
                     <span className="flex-1 truncate" onClick={e => { e.stopPropagation(); openModal(date, ev) }}>{ev.title}</span>
-                    <Button size="sm" variant="ghost" className="px-1 py-0.5 text-xs" onClick={e => { e.stopPropagation(); openModal(date, ev) }}>Edit</Button>
-                    <Button size="sm" variant="ghost" className="px-1 py-0.5 text-xs text-red-400" onClick={e => { e.stopPropagation(); setEditingEvent(ev); setModalDate(date); setShowModal(true); setEventTitle(ev.title); }}>Del</Button>
                   </div>
                 ))}
               </div>

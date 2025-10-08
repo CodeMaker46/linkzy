@@ -48,7 +48,7 @@ export default function ToDoList() {
 			q,
 			snap => {
 				const next = snap.docs.map((d) => {
-					const data = d.data() as any
+					const data = d.data({ serverTimestamps: 'estimate' }) as any
 					const t: Task = {
 						id: d.id,
 						text: String(data?.text ?? ''),
@@ -109,24 +109,24 @@ export default function ToDoList() {
 		<div className="space-y-3">
 			{!pairId && (
 				<div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm">
-					Link a partner in Chat to share tasks.
+					Go to Profile to connect with a partner and share tasks.
 				</div>
 			)}
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <input
           id="task-input"
           name="task"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Add a task…"
-          className="flex-1 input"
+          className="flex-1 input h-10"
         />
         <select
           id="assignee-select"
           name="assignee"
           value={assignee}
           onChange={(e) => setAssignee(e.target.value as any)}
-          className="input"
+          className="input h-10"
         >
           <option value="me">Me</option>
           <option value="partner">Partner</option>

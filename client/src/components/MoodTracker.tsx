@@ -22,7 +22,7 @@ export default function MoodTracker() {
   useEffect(() => {
     if (!myDoc) return
     return onSnapshot(myDoc, (snap: any) => {
-      const data = snap.data() as any
+      const data = snap.data({ serverTimestamps: 'estimate' }) as any
       if (data?.mood) setMine(data.mood)
     })
   }, [myDoc])
@@ -30,7 +30,7 @@ export default function MoodTracker() {
   useEffect(() => {
     if (!partnerDoc) return
     return onSnapshot(partnerDoc, (snap: any) => {
-      const data = snap.data() as any
+      const data = snap.data({ serverTimestamps: 'estimate' }) as any
       if (data?.mood) setPartner(data.mood)
     })
   }, [partnerDoc])
@@ -46,7 +46,7 @@ export default function MoodTracker() {
       <Row label="You" value={mine} onChange={updateMyMood} editable />
       <Row label="Partner" value={partner} onChange={() => {}} editable={false} />
       {!pairId && (
-        <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm">Link a partner in Chat to share moods.</div>
+        <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm">Go to Profile to connect with a partner and share moods.</div>
       )}
     </div>
   )
@@ -56,7 +56,7 @@ function Row({ label, value, onChange, editable = true }: { label: string; value
   return (
     <div className="flex items-center gap-3">
       <div className="w-20 opacity-70 text-sm">{label}</div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {moods.map(m => (
           <button
             key={m}
