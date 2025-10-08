@@ -9,17 +9,31 @@ function computePairId(a: string, b: string) {
   return [a, b].sort().join('_')
 }
 
+interface Memory {
+  id: string;
+  url: string;
+  uploader: string;
+  timestamp: any;
+  description: string;
+}
+
 export default function MemoryGallery() {
   const user = useAppStore(s => s.user)
   const partnerUid = useAppStore(s => s.partnerUid)
-  const [items, setItems] = useState<any[]>([])
+  const [items, setItems] = useState<Memory[]>([])
   const pairId = user?.uid && partnerUid ? computePairId(user.uid, partnerUid) : null
   const memRef = useMemo(() => pairId ? collection(db, 'pairs', pairId, 'memories') : (null as any), [pairId])
 
   useEffect(() => {
     if (!pairId || !memRef) return
     const q = query(memRef, orderBy('timestamp', 'desc'))
-    return onSnapshot(q, snap => setItems(snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }))))
+    return onSnapshot(q, snap => {
+      const newItems = snap.docs.map(d => {
+        if (!d.exists()) return null
+        return { id: d.id, ...d.data() } as Memory
+      })
+      setItems(newItems.filter((item): item is Memory => item !== null))
+    })
   }, [pairId, memRef])
 
   async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {

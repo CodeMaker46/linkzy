@@ -7,7 +7,7 @@ import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { db } from '../firebase/firebase.ts'
 import { useAppStore } from '../store/useAppStore.ts'
 import StatCard from './StatCard.tsx'
-import { CheckCircle2, Heart, CalendarDays, MessageCircle, Music, Code, Wallet, Image as ImageIcon, LayoutGrid } from 'lucide-react'
+import { CheckCircle2, Heart } from 'lucide-react'
 import HeroBanner from './HeroBanner.tsx'
 import ExpenseTracker from './ExpenseTracker.tsx'
 
@@ -65,15 +65,6 @@ export default function Dashboard() {
         </motion.div>
       </div>
     </div>
-  )
-}
-
-function Quick({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) {
-  return (
-    <a href={to} className="inline-flex items-center gap-1 rounded-xl border border-white/10 px-3 py-1.5 text-sm hover:bg-white/5">
-      {icon}
-      <span>{label}</span>
-    </a>
   )
 }
 

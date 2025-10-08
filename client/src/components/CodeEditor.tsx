@@ -7,15 +7,9 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { db } from '../firebase/firebase'
 import { doc, onSnapshot, serverTimestamp, setDoc, DocumentSnapshot } from 'firebase/firestore'
-import type { DocumentData, Timestamp } from 'firebase/firestore'
+import type { DocumentData } from 'firebase/firestore'
 import { useAppStore } from '../store/useAppStore'
 import { Play } from 'lucide-react'
-
-// Define proper interfaces for our data
-interface EditorDocument {
-  content: string;
-  updatedAt: Timestamp | null;
-}
 
 function computePairId(a: string, b: string) {
   return [a, b].sort().join('_')

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, writeBatch, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '../firebase/firebase'
 import { useAppStore } from '../store/useAppStore'
-import { ChevronDown, Search, SlidersHorizontal, Utensils, Car, Smile, ShoppingBag, Trash2, Edit, X, Check, Target, Plus } from 'lucide-react'
+import { Search, SlidersHorizontal, Utensils, Car, Smile, ShoppingBag, Trash2, Edit, X, Check, Target, Plus } from 'lucide-react'
 import { ResponsiveContainer, PieChart, Pie, Cell, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 
 // Define a type for our expense items
@@ -291,10 +291,10 @@ export default function ExpenseTracker() {
                     <div key={item.id} className="bg-white/5 p-3 rounded-lg">
                       {editingItemId === item.id ? (
                         <div className="space-y-2">
-                          <input type="text" value={editedItem.title} onChange={e => setEditedItem(prev => ({ ...prev, title: e.target.value }))} className="input bg-white/10 w-full" />
+                          <input type="text" value={editedItem.title} onChange={e => setEditedItem((prev: Expense) => ({ ...prev, title: e.target.value }))} className="input bg-white/10 w-full" />
                           <div className="flex gap-2">
-                            <input type="number" value={editedItem.amount} onChange={e => setEditedItem(prev => ({ ...prev, amount: Number(e.target.value) }))} className="input bg-white/10 w-full" />
-                            <select value={editedItem.category} onChange={e => setEditedItem(prev => ({ ...prev, category: e.target.value }))} className="input bg-white/10 w-full">
+                            <input type="number" value={editedItem.amount} onChange={e => setEditedItem((prev: Expense) => ({ ...prev, amount: Number(e.target.value) }))} className="input bg-white/10 w-full" />
+                            <select value={editedItem.category} onChange={e => setEditedItem((prev: Expense) => ({ ...prev, category: e.target.value }))} className="input bg-white/10 w-full">
                               {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                           </div>
@@ -355,7 +355,7 @@ export default function ExpenseTracker() {
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie data={analyticsByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={5}>
-                    {analyticsByCategory.map((entry, index) => (
+                    {analyticsByCategory.map((_entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
